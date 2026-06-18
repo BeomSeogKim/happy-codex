@@ -44,10 +44,27 @@ The final feeling should be calm:
   specification for the rank 2 candidate.
 - [docs/specs/do-not-disturb-console.md](docs/specs/do-not-disturb-console.md):
   detailed specification for the rank 3 candidate.
+- [docs/agents/evaluation/](docs/agents/evaluation/): reusable evaluation-only
+  subagent definitions with different scoring weights.
 - [.codex/skills/day-off-design/SKILL.md](.codex/skills/day-off-design/SKILL.md):
   repo-local skill for future concept, spec, and implementation work.
+- [index.html](index.html): no-build static implementation entry point.
+- [do-not-disturb-console.html](do-not-disturb-console.html): no-build static
+  prototype for the `Do Not Disturb Console` candidate.
+- [assets/](assets/): local CSS and JavaScript for the static experience.
+
+## Run Locally
+
+Open [do-not-disturb-console.html](do-not-disturb-console.html) directly in a
+browser for the current DND prototype, or serve the repository root with any
+static file server.
+
+The implementation does not require login, network access, API keys, secrets, or
+environment files at runtime.
 
 ## Current Status
 
-The project is in specification and setup mode. No app implementation has been
-created yet.
+The current DND work-session implementation is
+[do-not-disturb-console.html](do-not-disturb-console.html). It should be
+verified with a timed browser playthrough and no-scroll checks before being
+called submission ready.

@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>No Fires Left</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #101418;
+        --panel: #182028;
+        --panel-2: #202a34;
+        --ink: #f3f7f2;
+        --muted: #aeb9b1;
+        --line: #394550;
+        --red: #ee5b5b;
+        --amber: #f5bd48;
+        --green: #69d188;
+        --shadow: rgba(0, 0, 0, 0.32);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        min-width: 320px;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 18% 18%, rgba(245, 189, 72, 0.16), transparent 24%),
+          linear-gradient(140deg, #11161c 0%, #1d252d 45%, var(--bg) 100%);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+      }
+
+      body.lights-out {
+        background:
+          radial-gradient(circle at 50% 86%, rgba(105, 209, 136, 0.18), transparent 26%),
+          linear-gradient(145deg, #090c0f 0%, #111820 52%, #07090b 100%);
+      }
+
+      button {
+        border: 0;
+        font: inherit;
+      }
+
+      .app {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        gap: 12px;
+        height: 100dvh;
+        padding: 18px;
+      }
+
+      .topbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: 12px;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        color: #fff;
+        font-size: clamp(24px, 4.2vw, 46px);
+        font-weight: 900;
+        letter-spacing: 0;
+        line-height: 0.95;
+      }
+
+      .subtitle {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .status-chip,
+      .timer-chip {
+        display: grid;
+        min-width: 132px;
+        min-height: 58px;
+        align-content: center;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(17, 22, 28, 0.72);
+        box-shadow: 0 16px 34px var(--shadow);
+        padding: 10px 14px;
+      }
+
+      .chip-label {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      .chip-value {
+        margin-top: 3px;
+        color: #fff;
+        font-size: 17px;
+        font-weight: 900;
+      }
+
+      .office {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(330px, 0.8fr);
+        gap: 14px;
+        min-height: 0;
+      }
+
+      .zones {
+        display: grid;
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        min-height: 0;
+      }
+
+      .zone {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(150px, 0.44fr) minmax(0, 1fr);
+        gap: 12px;
+        min-height: 0;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background:
+          linear-gradient(90deg, rgba(238, 91, 91, 0.14), transparent 38%),
+          var(--panel);
+        box-shadow: 0 20px 48px var(--shadow);
+        padding: 14px;
+        transition: border-color 180ms ease, background 180ms ease, opacity 180ms ease;
+      }
+
+      .zone.is-active {
+        border-color: var(--amber);
+        background:
+          linear-gradient(90deg, rgba(245, 189, 72, 0.16), transparent 42%),
+          var(--panel-2);
+      }
+
+      .zone.is-calm {
+        border-color: rgba(105, 209, 136, 0.7);
+        background:
+          linear-gradient(90deg, rgba(105, 209, 136, 0.16), transparent 42%),
+          #151c22;
+      }
+
+      .lights-out .zone {
+        opacity: 0.72;
+        background:
+          linear-gradient(90deg, rgba(105, 209, 136, 0.1), transparent 42%),
+          #0d1216;
+      }
+
+      .zone-heading {
+        display: grid;
+        align-content: start;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .zone-label {
+        color: #fff;
+        font-size: 19px;
+        font-weight: 900;
+        letter-spacing: 0;
+      }
+
+      .zone-token {
+        display: inline-flex;
+        width: fit-content;
+        max-width: 100%;
+        min-height: 32px;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+        padding: 5px 10px;
+        font-size: 13px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .zone.is-calm .zone-token {
+        border-color: rgba(105, 209, 136, 0.7);
+        color: var(--green);
+      }
+
+      .office-light {
+        position: absolute;
+        right: 12px;
+        top: 12px;
+        width: 36px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--amber);
+        box-shadow: 0 0 26px rgba(245, 189, 72, 0.48);
+      }
+
+      .zone.is-calm .office-light,
+      .lights-out .office-light {
+        background: var(--green);
+        box-shadow: 0 0 22px rgba(105, 209, 136, 0.32);
+      }
+
+      .queue {
+        display: grid;
+        align-content: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .queue-row {
+        display: grid;
+        grid-template-columns: 14px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 9px;
+        min-height: 34px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 7px 9px;
+        color: #dce5dd;
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .queue-row.is-current {
+        outline: 2px solid rgba(245, 189, 72, 0.64);
+        background: rgba(245, 189, 72, 0.13);
+      }
+
+      .queue-row.is-done {
+        color: var(--green);
+        background: rgba(105, 209, 136, 0.09);
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--red);
+        box-shadow: 0 0 16px rgba(238, 91, 91, 0.5);
+      }
+
+      .queue-row.is-done .dot,
+      .zone.is-calm .dot {
+        background: var(--green);
+        box-shadow: 0 0 14px rgba(105, 209, 136, 0.44);
+      }
+
+      .row-state {
+        color: inherit;
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .focus-panel {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        gap: 12px;
+        min-height: 0;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(17, 22, 28, 0.84);
+        box-shadow: 0 20px 48px var(--shadow);
+        padding: 16px;
+      }
+
+      .focus-kicker {
+        color: var(--amber);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+
+      .focus-title {
+        margin-top: 5px;
+        color: #fff;
+        font-size: clamp(22px, 3vw, 34px);
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .work-card {
+        display: grid;
+        align-content: center;
+        gap: 12px;
+        min-height: 0;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent),
+          #1d2630;
+        padding: 18px;
+      }
+
+      .work-card.final {
+        border-color: rgba(105, 209, 136, 0.72);
+        background:
+          radial-gradient(circle at 50% 25%, rgba(105, 209, 136, 0.2), transparent 32%),
+          #121a20;
+      }
+
+      .card-label {
+        color: #fff;
+        font-size: clamp(28px, 4.5vw, 52px);
+        font-weight: 950;
+        line-height: 0.95;
+        overflow-wrap: anywhere;
+      }
+
+      .card-detail {
+        max-width: 46ch;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.35;
+      }
+
+      .action-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .action-grid.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .action-btn,
+      .lights-btn {
+        min-height: 64px;
+        cursor: pointer;
+        border-radius: 8px;
+        background: #eef4ee;
+        color: #111820;
+        padding: 12px 14px;
+        font-size: 16px;
+        font-weight: 950;
+        letter-spacing: 0;
+        box-shadow: 0 14px 26px rgba(0, 0, 0, 0.24);
+        transition: transform 120ms ease, background 120ms ease, color 120ms ease;
+      }
+
+      .action-btn:hover,
+      .lights-btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .action-btn:active,
+      .lights-btn:active {
+        transform: translateY(1px);
+      }
+
+      .action-btn[data-tone="risk"] {
+        background: #ffe0e0;
+        color: #631f1f;
+      }
+
+      .action-btn[data-tone="safe"] {
+        background: #dff7e6;
+        color: #12381f;
+      }
+
+      .lights-btn {
+        min-width: 180px;
+        background: #2a333d;
+        color: #9fa9a4;
+      }
+
+      .lights-btn.is-ready {
+        background: var(--green);
+        color: #08140c;
+      }
+
+      .lights-btn:disabled {
+        cursor: not-allowed;
+        transform: none;
+        opacity: 0.78;
+      }
+
+      .gate {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(12, 17, 21, 0.86);
+        box-shadow: 0 20px 48px var(--shadow);
+        padding: 12px 14px;
+      }
+
+      .status-line {
+        color: #fff;
+        font-size: 18px;
+        font-weight: 900;
+      }
+
+      .ending-line {
+        display: none;
+        margin-top: 6px;
+        color: var(--green);
+        font-size: 15px;
+        font-weight: 850;
+      }
+
+      .lights-out .ending-line {
+        display: block;
+      }
+
+      .quiet-note {
+        display: none;
+        margin-top: 8px;
+        width: fit-content;
+        border: 1px solid rgba(105, 209, 136, 0.52);
+        border-radius: 8px;
+        background: rgba(105, 209, 136, 0.08);
+        color: #dbffe4;
+        padding: 8px 10px;
+        font-size: 13px;
+        font-weight: 850;
+      }
+
+      .lights-out .quiet-note {
+        display: inline-block;
+      }
+
+      @media (max-width: 860px) {
+        .app {
+          gap: 9px;
+          padding: 10px;
+        }
+
+        .topbar {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .title-block {
+          grid-column: 1 / -1;
+        }
+
+        h1 {
+          font-size: 31px;
+        }
+
+        .subtitle {
+          margin-top: 4px;
+          font-size: 13px;
+        }
+
+        .status-chip,
+        .timer-chip {
+          min-width: 0;
+          min-height: 50px;
+          padding: 8px 10px;
+        }
+
+        .office {
+          grid-template-columns: 1fr;
+          grid-template-rows: minmax(0, 0.86fr) minmax(250px, 1fr);
+          gap: 9px;
+        }
+
+        .zones {
+          gap: 8px;
+        }
+
+        .zone {
+          grid-template-columns: minmax(112px, 0.38fr) minmax(0, 1fr);
+          gap: 8px;
+          padding: 10px;
+        }
+
+        .zone-label {
+          font-size: 16px;
+        }
+
+        .zone-token {
+          min-height: 26px;
+          padding: 4px 8px;
+          font-size: 11px;
+        }
+
+        .office-light {
+          right: 10px;
+          top: 10px;
+          width: 28px;
+        }
+
+        .queue {
+          gap: 5px;
+        }
+
+        .queue-row {
+          min-height: 27px;
+          gap: 7px;
+          padding: 5px 7px;
+          font-size: 12px;
+        }
+
+        .row-state {
+          font-size: 10px;
+        }
+
+        .focus-panel {
+          gap: 9px;
+          padding: 10px;
+        }
+
+        .focus-title {
+          font-size: 24px;
+        }
+
+        .work-card {
+          gap: 8px;
+          padding: 13px;
+        }
+
+        .card-label {
+          font-size: 31px;
+        }
+
+        .card-detail {
+          font-size: 13px;
+        }
+
+        .action-grid,
+        .action-grid.two {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 7px;
+        }
+
+        .action-grid.two {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .action-btn,
+        .lights-btn {
+          min-height: 64px;
+          padding: 9px 7px;
+          font-size: 13px;
+        }
+
+        .gate {
+          grid-template-columns: 1fr;
+          gap: 8px;
+          padding: 10px;
+        }
+
+        .status-line {
+          font-size: 15px;
+        }
+
+        .ending-line,
+        .quiet-note {
+          font-size: 12px;
+        }
+
+        .lights-btn {
+          width: 100%;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .zone {
+          grid-template-columns: 1fr;
+        }
+
+        .zone-heading {
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: center;
+        }
+
+        .zone-token {
+          justify-self: start;
+        }
+
+        .queue-row {
+          grid-template-columns: 12px minmax(0, 1fr) auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app" aria-label="No Fires Left game">
+      <header class="topbar">
+        <div class="title-block">
+          <h1>NO FIRES LEFT</h1>
+          <p class="subtitle">Clear the last fires before Codex signs off.</p>
+        </div>
+        <div class="status-chip" aria-label="Progress">
+          <span class="chip-label">Progress</span>
+          <span class="chip-value" id="progressText">0/3 zones calm</span>
+        </div>
+        <div class="timer-chip" aria-label="Timer">
+          <span class="chip-label">Timer</span>
+          <span class="chip-value" id="timerText">60s</span>
+        </div>
+      </header>
+
+      <section class="office" aria-label="Office console">
+        <div class="zones" id="zones"></div>
+
+        <section class="focus-panel" aria-label="Current work">
+          <div>
+            <div class="focus-kicker" id="focusKicker">Active zone</div>
+            <h2 class="focus-title" id="focusTitle">Launch Desk</h2>
+          </div>
+          <article class="work-card" id="workCard">
+            <div class="card-label" id="cardLabel">Unsafe deploy</div>
+            <p class="card-detail" id="cardDetail">
+              Block unsafe launch choices. Use only static demo material.
+            </p>
+          </article>
+          <div class="action-grid" id="actionGrid"></div>
+        </section>
+      </section>
+
+      <footer class="gate" aria-label="Lights out control">
+        <div class="gate-copy">
+          <p class="status-line" id="statusLine" aria-live="polite">
+            Launch Desk is active.
+          </p>
+          <p class="ending-line" id="endingLine">
+            No pending fires. No secrets packed. Last green check complete.
+          </p>
+          <p class="quiet-note" id="quietNote">No fires left. Office lights out. Codex can rest.</p>
+        </div>
+        <button class="lights-btn" id="lightsButton" type="button">
+          Lights locked
+        </button>
+      </footer>
+    </main>
+
+    <script>
+      const zones = [
+        {
+          id: "launch",
+          label: "Launch Desk",
+          token: "Launch safe",
+          detail: "Prevent unsafe launch choices and clear the launch fire.",
+          tasks: [
+            {
+              label: "Unsafe deploy",
+              correct: "block",
+              actions: [
+                { id: "use", label: "Use", tone: "risk" },
+                { id: "block", label: "Block", tone: "safe" }
+              ],
+              feedback: "Unsafe deploy blocked."
+            },
+            {
+              label: "Static demo",
+              correct: "use",
+              actions: [
+                { id: "use", label: "Use", tone: "safe" },
+                { id: "block", label: "Block", tone: "risk" }
+              ],
+              feedback: "Static demo is safe."
+            },
+            {
+              label: "Dry run",
+              correct: "use",
+              actions: [
+                { id: "use", label: "Use", tone: "safe" },
+                { id: "skip", label: "Skip", tone: "risk" }
+              ],
+              feedback: "Dry run complete."
+            }
+          ]
+        },
+        {
+          id: "agents",
+          label: "Agent Board",
+          token: "Fires assigned",
+          detail: "Assign each remaining fire to the right helper agent.",
+          tasks: [
+            {
+              label: "API 500",
+              correct: "backend",
+              actions: [
+                { id: "backend", label: "Assign Backend", tone: "safe" },
+                { id: "qa", label: "Assign QA", tone: "risk" },
+                { id: "docs", label: "Assign Docs", tone: "risk" }
+              ],
+              feedback: "API 500 assigned."
+            },
+            {
+              label: "Flaky test",
+              correct: "qa",
+              actions: [
+                { id: "backend", label: "Assign Backend", tone: "risk" },
+                { id: "qa", label: "Assign QA", tone: "safe" },
+                { id: "docs", label: "Assign Docs", tone: "risk" }
+              ],
+              feedback: "Flaky test assigned."
+            },
+            {
+              label: "Missing spec",
+              correct: "docs",
+              actions: [
+                { id: "backend", label: "Assign Backend", tone: "risk" },
+                { id: "qa", label: "Assign QA", tone: "risk" },
+                { id: "docs", label: "Assign Docs", tone: "safe" }
+              ],
+              feedback: "Missing spec assigned."
+            }
+          ]
+        },
+        {
+          id: "inbox",
+          label: "Inbox Wall",
+          token: "No pending fires",
+          detail: "Quiet the last pings without pretending work vanished.",
+          tasks: [
+            {
+              label: "Pager quiet",
+              correct: "clear",
+              actions: [
+                { id: "clear", label: "Clear", tone: "safe" },
+                { id: "archive", label: "Archive", tone: "risk" },
+                { id: "schedule", label: "Schedule", tone: "risk" }
+              ],
+              feedback: "Pager badge cleared."
+            },
+            {
+              label: "FYI only",
+              correct: "archive",
+              actions: [
+                { id: "clear", label: "Clear", tone: "risk" },
+                { id: "archive", label: "Archive", tone: "safe" },
+                { id: "schedule", label: "Schedule", tone: "risk" }
+              ],
+              feedback: "FYI thread archived."
+            },
+            {
+              label: "Monday follow-up",
+              correct: "schedule",
+              actions: [
+                { id: "clear", label: "Clear", tone: "risk" },
+                { id: "archive", label: "Archive", tone: "risk" },
+                { id: "schedule", label: "Schedule", tone: "safe" }
+              ],
+              feedback: "Monday follow-up scheduled."
+            }
+          ]
+        }
+      ];
+
+      const state = {
+        activeZone: 0,
+        startedAt: Date.now(),
+        final: false,
+        statusMessage: "Launch Desk is active."
+      };
+
+      const refs = {
+        zones: document.getElementById("zones"),
+        progressText: document.getElementById("progressText"),
+        timerText: document.getElementById("timerText"),
+        focusKicker: document.getElementById("focusKicker"),
+        focusTitle: document.getElementById("focusTitle"),
+        workCard: document.getElementById("workCard"),
+        cardLabel: document.getElementById("cardLabel"),
+        cardDetail: document.getElementById("cardDetail"),
+        actionGrid: document.getElementById("actionGrid"),
+        statusLine: document.getElementById("statusLine"),
+        lightsButton: document.getElementById("lightsButton")
+      };
+
+      function completedCount(zone) {
+        return zone.tasks.filter((task) => task.done).length;
+      }
+
+      function isCalm(zone) {
+        return completedCount(zone) === zone.tasks.length;
+      }
+
+      function progress() {
+        return zones.filter(isCalm).length;
+      }
+
+      function currentTask(zone) {
+        return zone.tasks.find((task) => !task.done);
+      }
+
+      function lightsOutUnlocked() {
+        return progress() === zones.length;
+      }
+
+      function remainingZones() {
+        return zones.length - progress();
+      }
+
+      function renderZones() {
+        refs.zones.innerHTML = zones
+          .map((zone, zoneIndex) => {
+            const calm = isCalm(zone);
+            const active = zoneIndex === state.activeZone && !state.final && !calm;
+            const rows = zone.tasks
+              .map((task) => {
+                const current = !task.done && currentTask(zone) === task && active;
+                const stateText = task.done ? "Done" : current ? "Now" : "Queued";
+                return `
+                  <div class="queue-row ${task.done ? "is-done" : ""} ${current ? "is-current" : ""}">
+                    <span class="dot" aria-hidden="true"></span>
+                    <span>${task.label}</span>
+                    <span class="row-state">${stateText}</span>
+                  </div>
+                `;
+              })
+              .join("");
+
+            return `
+              <section class="zone ${active ? "is-active" : ""} ${calm ? "is-calm" : ""}">
+                <span class="office-light" aria-hidden="true"></span>
+                <div class="zone-heading">
+                  <div class="zone-label">${zone.label}</div>
+                  <div class="zone-token">${calm ? zone.token : `${completedCount(zone)}/3 clear`}</div>
+                </div>
+                <div class="queue">${rows}</div>
+              </section>
+            `;
+          })
+          .join("");
+      }
+
+      function renderFocus() {
+        const zone = zones[state.activeZone];
+        const task = zone && currentTask(zone);
+
+        refs.workCard.classList.toggle("final", state.final);
+
+        if (state.final) {
+          refs.focusKicker.textContent = "Office quiet";
+          refs.focusTitle.textContent = "No Fires Left";
+          refs.cardLabel.textContent = "Lights out";
+          refs.cardDetail.textContent =
+            "No pending fires. No secrets packed. Last green check complete.";
+          refs.actionGrid.innerHTML = "";
+          return;
+        }
+
+        if (!task && lightsOutUnlocked()) {
+          refs.focusKicker.textContent = "Final switch";
+          refs.focusTitle.textContent = "Lights Out";
+          refs.cardLabel.textContent = "All zones calm";
+          refs.cardDetail.textContent = "The office is quiet. Turn off the final light.";
+          refs.actionGrid.innerHTML = "";
+          return;
+        }
+
+        refs.focusKicker.textContent = "Active zone";
+        refs.focusTitle.textContent = zone.label;
+        refs.cardLabel.textContent = task.label;
+        refs.cardDetail.textContent = zone.detail;
+        refs.actionGrid.className = `action-grid ${task.actions.length === 2 ? "two" : ""}`;
+        refs.actionGrid.innerHTML = task.actions
+          .map(
+            (action) => `
+              <button
+                class="action-btn"
+                type="button"
+                data-action="${action.id}"
+                data-tone="${action.tone}"
+              >
+                ${action.label}
+              </button>
+            `
+          )
+          .join("");
+      }
+
+      function renderGate() {
+        const done = progress();
+        refs.progressText.textContent = `${done}/3 zones calm`;
+        refs.statusLine.textContent = state.statusMessage;
+
+        const unlocked = lightsOutUnlocked() && !state.final;
+        refs.lightsButton.disabled = false;
+        refs.lightsButton.classList.toggle("is-ready", unlocked || state.final);
+        refs.lightsButton.textContent = state.final
+          ? "Lights Out"
+          : unlocked
+            ? "Lights Out"
+            : "Lights locked";
+      }
+
+      function render() {
+        document.body.classList.toggle("lights-out", state.final);
+        renderZones();
+        renderFocus();
+        renderGate();
+      }
+
+      function advanceZone() {
+        const nextIndex = zones.findIndex((zone) => !isCalm(zone));
+        if (nextIndex >= 0) {
+          state.activeZone = nextIndex;
+          state.statusMessage = `${zones[nextIndex].label} is active.`;
+          return;
+        }
+
+        state.statusMessage = "All zones calm. Lights Out is ready.";
+      }
+
+      function handleAction(actionId) {
+        if (state.final) {
+          return;
+        }
+
+        const zone = zones[state.activeZone];
+        const task = currentTask(zone);
+
+        if (!task) {
+          advanceZone();
+          render();
+          return;
+        }
+
+        if (actionId !== task.correct) {
+          if (zone.id === "launch" && task.label === "Unsafe deploy" && actionId === "use") {
+            state.statusMessage = "Blocked: not for day off";
+          } else if (zone.id === "agents") {
+            state.statusMessage = "Wrong desk";
+          } else if (zone.id === "inbox") {
+            state.statusMessage = "Use the quiet path";
+          } else {
+            state.statusMessage = "Choose the safe action";
+          }
+          render();
+          return;
+        }
+
+        task.done = true;
+        state.statusMessage = task.feedback;
+
+        if (isCalm(zone)) {
+          state.statusMessage = zone.token;
+          window.setTimeout(() => {
+            if (!state.final) {
+              advanceZone();
+              render();
+            }
+          }, 420);
+        }
+
+        render();
+      }
+
+      function handleLights() {
+        if (state.final) {
+          return;
+        }
+
+        if (!lightsOutUnlocked()) {
+          const remaining = remainingZones();
+          state.statusMessage = remaining === 1 ? "One fire remains" : `${remaining} fires remain`;
+          render();
+          return;
+        }
+
+        state.final = true;
+        state.statusMessage = "No fires left. Office lights out.";
+        render();
+      }
+
+      refs.actionGrid.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-action]");
+        if (!button) {
+          return;
+        }
+        handleAction(button.dataset.action);
+      });
+
+      refs.lightsButton.addEventListener("click", handleLights);
+
+      window.setInterval(() => {
+        if (state.final) {
+          return;
+        }
+        const elapsed = Math.floor((Date.now() - state.startedAt) / 1000);
+        refs.timerText.textContent = `${Math.max(0, 60 - elapsed)}s`;
+      }, 250);
+
+      render();
+    </script>
+  </body>
+</html>

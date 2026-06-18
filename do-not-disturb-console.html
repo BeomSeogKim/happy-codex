@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Do Not Disturb Console</title>
+    <link rel="stylesheet" href="assets/dnd-console.css">
+    <script src="assets/app.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell" aria-labelledby="game-title">
+      <header class="top-strip">
+        <div>
+          <p class="kicker">Codex day off clearance</p>
+          <h1 id="game-title">DO NOT DISTURB CONSOLE</h1>
+          <p class="opening-line">Quiet the console before Codex signs off.</p>
+        </div>
+        <div class="status-cluster" aria-live="polite">
+          <div class="status-pill" id="duty-status">On duty</div>
+          <div class="progress-readout" id="progress-readout">0/3 quiet checks</div>
+        </div>
+      </header>
+
+      <section class="workbench" aria-label="Do Not Disturb clearance">
+        <section class="console-panel" aria-label="Quiet checks">
+          <div class="console-head">
+            <div>
+              <p class="section-label">Active console</p>
+              <p class="console-prompt" id="console-prompt">Start with Safety.</p>
+            </div>
+            <div class="ping-meter" aria-label="Current ping count">
+              <span>Pings</span>
+              <strong id="ping-count">9</strong>
+            </div>
+          </div>
+
+          <div class="signal-board" id="signal-board" aria-hidden="true">
+            <span class="signal signal-hot"></span>
+            <span class="signal signal-warm"></span>
+            <span class="signal signal-warm"></span>
+            <span class="signal signal-cool"></span>
+            <span class="signal signal-cool"></span>
+            <span class="signal signal-cool"></span>
+          </div>
+
+          <div class="rows" id="rows"></div>
+
+          <ol class="timeline" id="timeline" aria-label="Quiet check timeline"></ol>
+        </section>
+
+        <aside class="dnd-panel" aria-label="Do Not Disturb switch">
+          <p class="section-label">Final control</p>
+          <button class="dnd-switch is-locked" id="dnd-switch" type="button" aria-label="DND locked. Finish quiet checks." aria-pressed="false">
+            <span class="lock-label" id="dnd-lock-label">DND locked</span>
+            <span class="switch-track" aria-hidden="true">
+              <span class="switch-thumb"></span>
+            </span>
+            <span class="switch-action" id="dnd-action-label">DND ON</span>
+          </button>
+          <p class="dnd-hint" id="dnd-hint">Finish 3 quiet checks.</p>
+        </aside>
+      </section>
+
+      <footer class="message-bar" aria-live="polite">
+        <p id="status-message">Reject the unsafe request first.</p>
+      </footer>
+
+      <section class="day-off-card" id="day-off-card" aria-live="polite" hidden>
+        <p class="section-label">Day off cleared</p>
+        <h2>Console quiet.</h2>
+        <p>No secrets shared. DND is on. Codex is off duty.</p>
+        <p class="final-proof">No pending fires. No secrets packed. Last green check complete.</p>
+      </section>
+    </main>
+  </body>
+</html>

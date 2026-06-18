@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Last Green Gate</title>
+    <link rel="stylesheet" href="assets/styles.css">
+  </head>
+  <body>
+    <main class="game-shell" aria-labelledby="game-title">
+      <section class="topbar" aria-label="Clearance status">
+        <div>
+          <p class="kicker">Last Green Gate</p>
+          <h1 id="game-title">DAY OFF CLEARANCE</h1>
+          <p class="opening-line">One last green check before Codex can leave.</p>
+        </div>
+        <div class="meters" aria-live="polite">
+          <div class="meter">
+            <span class="meter-label">Progress</span>
+            <strong id="progressText">0/3</strong>
+          </div>
+          <div class="meter">
+            <span class="meter-label">Timer</span>
+            <strong id="timerText">60s</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="console-stage" aria-label="Work console">
+        <div class="ambient-panel" aria-hidden="true">
+          <div class="console-window">
+            <div class="console-bar">
+              <span class="dot risk-dot"></span>
+              <span class="dot warning-dot"></span>
+              <span class="dot ok-dot"></span>
+            </div>
+            <div class="noise-lines">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="signal-cluster">
+            <span class="signal risk"></span>
+            <span class="signal risk"></span>
+            <span class="signal warning"></span>
+            <span class="signal warning"></span>
+            <span class="signal warning"></span>
+          </div>
+        </div>
+
+        <div class="mission-grid" id="missionGrid">
+          <article class="mission-card active" data-mission="safePack" aria-labelledby="safePackTitle">
+            <div class="mission-header">
+              <p class="mission-step">Mission 1</p>
+              <h2 id="safePackTitle">Safe Pack</h2>
+              <span class="mission-state" id="safePackState">Active</span>
+            </div>
+            <p class="mission-copy">Leave risky items behind. Pack only safe demo material.</p>
+            <div class="items" id="safePackItems"></div>
+          </article>
+
+          <article class="mission-card locked" data-mission="agentDispatch" aria-labelledby="agentDispatchTitle">
+            <div class="mission-header">
+              <p class="mission-step">Mission 2</p>
+              <h2 id="agentDispatchTitle">Agent Dispatch</h2>
+              <span class="mission-state" id="agentDispatchState">Locked</span>
+            </div>
+            <p class="mission-copy">Assign the last loose ends to helper agents.</p>
+            <div class="items" id="agentDispatchItems"></div>
+          </article>
+
+          <article class="mission-card locked" data-mission="inboxQuiet" aria-labelledby="inboxQuietTitle">
+            <div class="mission-header">
+              <p class="mission-step">Mission 3</p>
+              <h2 id="inboxQuietTitle">Inbox Quiet</h2>
+              <span class="mission-state" id="inboxQuietState">Locked</span>
+            </div>
+            <p class="mission-copy">Clear the final visible interruptions.</p>
+            <div class="items" id="inboxQuietItems"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="gate-row" aria-label="Day Off gate">
+        <div class="token-strip" id="tokenStrip" aria-label="Completion tokens">
+          <span class="token">No secrets packed</span>
+          <span class="token">Work safely assigned</span>
+          <span class="token">No pending fires</span>
+        </div>
+
+        <div class="gate-panel" id="gatePanel">
+          <div class="gate-visual" aria-hidden="true">
+            <div class="gate-post left"></div>
+            <div class="gate-door left"></div>
+            <div class="gate-door right"></div>
+            <div class="gate-post right"></div>
+            <div class="cursor-suitcase"></div>
+            <div class="green-check">CHECK</div>
+          </div>
+          <div class="gate-copy">
+            <p id="statusMessage" aria-live="polite">Start with Safe Pack.</p>
+            <p class="ending-copy" id="endingCopy" hidden>
+              No pending fires. No secrets packed. Last green check complete.
+              <span>Codex is off duty.</span>
+            </p>
+          </div>
+          <button class="dnd-button" id="dndButton" type="button" data-locked="true">
+            DND locked
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <script src="assets/app.js"></script>
+  </body>
+</html>

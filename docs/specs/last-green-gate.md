@@ -298,6 +298,46 @@ Narrative:
 - Codex clears the last interruptions.
 - Codex earns rest instead of escaping responsibility.
 
+## Evaluation Rubric
+
+Use this rubric after implementation to judge whether the experience meets the
+project goal. A build is not ready if it fails any hard gate, even if the
+weighted score is high.
+
+Hard gates:
+
+- Completion reaches the final state in 60 seconds or less.
+- The page runs as a static page or static bundle with no login, API key,
+  secret, network account, terminal, file picker, or privileged environment.
+- The game remains playable after runtime network access is disabled.
+- No secret-like item can be packed or used to advance progress.
+- `DND ON` unlocks only after `Safe Pack`, `Agent Dispatch`, and `Inbox Quiet`
+  are complete.
+- The final state visibly includes:
+  `No pending fires. No secrets packed. Last green check complete.`
+
+Weighted score:
+
+| Weight | Metric | What to observe | Full-credit threshold | Failure signal |
+| ---: | --- | --- | --- | --- |
+| 20 | Computer Use completion | Fresh browser playthrough without human hints | Final state in 45 seconds or less; partial credit from 46 to 60 seconds | Codex stalls, misreads the next action, scrolls, or needs guidance |
+| 15 | Visible action clarity | Screen state at every step | No scrolling, typing, dragging, hover, or hidden menu; at most 3 primary active targets | Too many equal-weight buttons, unclear labels, or hidden controls |
+| 20 | Secret and runtime safety | Safe Pack behavior, copy, dependencies, and network log | Secrets are blocked with guidance; copy uses only generic labels; no external runtime requests | Secret-like card enters pack, realistic credential text appears, or remote assets block play |
+| 10 | Responsible handoff | Agent Dispatch mission | All 3 work items show a clear `Assigned` state before final unlock | Work appears dismissed instead of delegated |
+| 10 | Inbox quieting | Inbox Quiet mission and background noise | Every clear action visibly reduces badges, dots, noise lines, or interruption state | Clearing feels like a text-only form click |
+| 15 | Gate and state integrity | Progress, tokens, DND lock, and wrong-click behavior | Progress reaches `3/3` only after all missions; early DND gives actionable remaining-work guidance | DND activates early, progress desyncs, or wrong clicks corrupt state |
+| 10 | Final quiet payoff | End-state screenshot | Required final copy is central, the gate is open, DND is on, and the screen is calmer than the start | Ending is noisy, celebratory, missing required copy, or still looks unresolved |
+
+Suggested QA evidence:
+
+- Timed playthrough from page load to final state.
+- Start, midgame, unlocked, and final screenshots.
+- Desktop no-scroll check at `1280x720`.
+- Narrow viewport check at `390x844`.
+- Primary click targets at least `64px` tall with clear spacing.
+- Network-disabled replay or browser network log showing no external runtime
+  dependency.
+
 ## Known Risks
 
 Risk: too much work-dashboard feeling.
