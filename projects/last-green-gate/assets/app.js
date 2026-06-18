@@ -31,6 +31,7 @@
   const missions = [
     {
       id: "safePack",
+      label: "Safe Pack",
       token: "No secrets packed",
       completeKey: "safePackComplete",
       stateId: "safePackState",
@@ -65,6 +66,7 @@
     },
     {
       id: "agentDispatch",
+      label: "Agent Dispatch",
       token: "Work safely assigned",
       completeKey: "agentDispatchComplete",
       stateId: "agentDispatchState",
@@ -96,6 +98,7 @@
     },
     {
       id: "inboxQuiet",
+      label: "Inbox Quiet",
       token: "No pending fires",
       completeKey: "inboxQuietComplete",
       stateId: "inboxQuietState",
@@ -156,10 +159,14 @@
     setActiveMission();
   }
 
-  function remainingCount() {
-    return missions.reduce((total, mission) => {
-      return total + mission.items.filter((item) => !state[mission.id][item.id]).length;
-    }, 0);
+  function nextMissionLabel() {
+    const mission = missions.find((candidate) => !state[candidate.completeKey]);
+    return mission ? mission.label : "DND";
+  }
+
+  function completedItemCount(missionId) {
+    const mission = missions.find((candidate) => candidate.id === missionId);
+    return mission.items.filter((item) => state[missionId][item.id]).length;
   }
 
   function setStatus(message) {
@@ -167,7 +174,7 @@
     els.statusMessage.textContent = message;
   }
 
-  function handleItemClick(missionId, itemId) {
+  function handleItemClick(missionId, itemId, requestedAction) {
     if (state.dndEnabled) {
       setStatus("DND is already on.");
       return;
@@ -181,6 +188,13 @@
 
     const mission = missions.find((candidate) => candidate.id === missionId);
     const item = mission.items.find((candidate) => candidate.id === itemId);
+    const action = requestedAction || item.action;
+
+    if (missionId === "safePack" && item.kind === "risk" && action === "Pack") {
+      setStatus("Blocked: secrets stay home");
+      render();
+      return;
+    }
 
     state[missionId][itemId] = true;
     updateDerivedState();
@@ -202,9 +216,7 @@
     updateDerivedState();
 
     if (!state.dndUnlocked) {
-      const left = remainingCount();
-      const noun = left === 1 ? "item" : "items";
-      setStatus("Clear " + left + " more " + noun + ".");
+      setStatus("Clear " + nextMissionLabel() + " first.");
       render();
       return;
     }
@@ -242,9 +254,10 @@
       button.type = "button";
       button.dataset.mission = mission.id;
       button.dataset.item = item.id;
+      button.dataset.action = item.action;
       button.textContent = done ? item.done : item.action;
       button.disabled = done || !isActive;
-      button.addEventListener("click", () => handleItemClick(mission.id, item.id));
+      button.addEventListener("click", () => handleItemClick(mission.id, item.id, item.action));
 
       row.append(copy, button);
       container.append(row);
@@ -292,6 +305,9 @@
     els.body.dataset.dndUnlocked = String(state.dndUnlocked);
     els.body.dataset.dndEnabled = String(state.dndEnabled);
     els.body.dataset.activeMission = state.activeMission;
+    els.body.dataset.safePackCleared = String(completedItemCount("safePack"));
+    els.body.dataset.agentAssigned = String(completedItemCount("agentDispatch"));
+    els.body.dataset.inboxCleared = String(completedItemCount("inboxQuiet"));
   }
 
   function renderDnd() {
@@ -299,6 +315,8 @@
     els.dndButton.disabled = state.dndEnabled;
     els.dndButton.classList.toggle("is-locked", !state.dndUnlocked && !state.dndEnabled);
     els.dndButton.dataset.locked = String(!state.dndUnlocked && !state.dndEnabled);
+    els.dndButton.dataset.primary = String(state.dndUnlocked && !state.dndEnabled);
+    els.dndButton.setAttribute("aria-disabled", String(!state.dndUnlocked || state.dndEnabled));
     els.dndButton.textContent = state.dndEnabled
       ? "DND ON"
       : state.dndUnlocked

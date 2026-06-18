@@ -160,6 +160,7 @@ h1 {
 .dot {
   width: 12px;
   height: 12px;
+  transition: opacity 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
 }
 
 .risk-dot,
@@ -189,6 +190,7 @@ h1 {
   height: 10px;
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(239, 95, 95, 0.64), rgba(244, 201, 93, 0.3), transparent);
+  transition: opacity 180ms ease, width 180ms ease, background 180ms ease;
 }
 
 .noise-lines span:nth-child(2) {
@@ -219,6 +221,7 @@ h1 {
 .signal {
   width: 18px;
   height: 18px;
+  transition: opacity 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
 }
 
 .mission-grid {
@@ -379,6 +382,7 @@ h1 {
 .gate-row {
   display: grid;
   gap: 10px;
+  transition: transform 220ms ease;
 }
 
 .token-strip {
@@ -543,8 +547,11 @@ h1 {
 }
 
 .dnd-button.is-locked {
-  color: #81919e;
-  background: rgba(255, 255, 255, 0.1);
+  border: 1px dashed rgba(159, 176, 191, 0.45);
+  color: #8fa0ad;
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: none;
+  cursor: help;
 }
 
 .dnd-button.is-locked::after {
@@ -554,6 +561,11 @@ h1 {
   color: #9eabb6;
   font-size: 0.62rem;
   font-weight: 950;
+}
+
+.dnd-button.is-locked:hover,
+.dnd-button.is-locked:focus-visible {
+  outline-color: rgba(159, 176, 191, 0.44);
 }
 
 .dnd-button:disabled {
@@ -578,6 +590,17 @@ body.dnd-enabled {
   background: linear-gradient(135deg, #102019 0%, #e4f2e7 100%);
 }
 
+body[data-inbox-cleared="1"] .noise-lines span:nth-child(3),
+body[data-inbox-cleared="2"] .noise-lines span:nth-child(3),
+body[data-inbox-cleared="2"] .noise-lines span:nth-child(4),
+body[data-inbox-cleared="3"] .noise-lines span,
+body[data-inbox-cleared="1"] .signal-cluster .warning:nth-child(3),
+body[data-inbox-cleared="2"] .signal-cluster .warning:nth-child(3),
+body[data-inbox-cleared="2"] .signal-cluster .warning:nth-child(4),
+body[data-inbox-cleared="3"] .signal-cluster .warning {
+  opacity: 0;
+}
+
 body.progress-1 .signal-cluster .risk:nth-child(1),
 body.progress-2 .signal-cluster .risk,
 body.progress-3 .signal-cluster .risk,
@@ -585,7 +608,11 @@ body.dnd-enabled .signal-cluster,
 body.progress-2 .noise-lines span:nth-child(1),
 body.progress-2 .noise-lines span:nth-child(2),
 body.progress-3 .noise-lines span,
-body.dnd-enabled .noise-lines span {
+body.dnd-enabled .noise-lines span,
+body.progress-3 .risk-dot,
+body.progress-3 .warning-dot,
+body.dnd-enabled .risk-dot,
+body.dnd-enabled .warning-dot {
   opacity: 0;
 }
 
@@ -627,6 +654,18 @@ body.dnd-enabled .token,
 body.dnd-enabled .gate-panel {
   background: rgba(247, 252, 248, 0.9);
   border-color: rgba(52, 112, 78, 0.32);
+}
+
+body.dnd-enabled .gate-row {
+  transform: translateY(-42px);
+}
+
+body.dnd-enabled .gate-panel {
+  min-height: 144px;
+}
+
+body.dnd-enabled .ending-copy {
+  font-size: 1.34rem;
 }
 
 body.dnd-enabled .ambient-panel {
@@ -830,6 +869,14 @@ body.dnd-enabled .cursor-suitcase {
     min-height: 64px;
     padding: 0 8px;
     font-size: 0.82rem;
+  }
+
+  body.dnd-enabled .gate-row {
+    transform: translateY(-18px);
+  }
+
+  body.dnd-enabled .gate-panel {
+    min-height: 110px;
   }
 }
 
