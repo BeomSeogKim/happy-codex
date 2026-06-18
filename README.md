@@ -49,22 +49,39 @@ The final feeling should be calm:
 - [.codex/skills/day-off-design/SKILL.md](.codex/skills/day-off-design/SKILL.md):
   repo-local skill for future concept, spec, and implementation work.
 - [index.html](index.html): no-build static implementation entry point.
+- [projects/last-green-gate/](projects/last-green-gate/): isolated copy of
+  the selected implementation for evaluation.
 - [do-not-disturb-console.html](do-not-disturb-console.html): no-build static
   prototype for the `Do Not Disturb Console` candidate.
 - [assets/](assets/): local CSS and JavaScript for the static experience.
 
 ## Run Locally
 
-Open [do-not-disturb-console.html](do-not-disturb-console.html) directly in a
-browser for the current DND prototype, or serve the repository root with any
-static file server.
+Open [index.html](index.html) directly in a browser for the current
+`Last Green Gate` implementation, or serve the repository root with any static
+file server.
+
+When served from the repository root, the selected implementation is available
+at:
+
+```text
+/
+/projects/last-green-gate/
+```
 
 The implementation does not require login, network access, API keys, secrets, or
 environment files at runtime.
 
+## Deploy
+
+GitHub Pages deployment is handled by
+[.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml). The
+workflow verifies the static files, builds a Pages artifact from `index.html`,
+`assets/`, and `projects/`, then deploys on pushes to `main` or manual
+`workflow_dispatch`.
+
 ## Current Status
 
-The current DND work-session implementation is
-[do-not-disturb-console.html](do-not-disturb-console.html). It should be
-verified with a timed browser playthrough and no-scroll checks before being
-called submission ready.
+The current work-session implementation is `Last Green Gate` at
+[index.html](index.html). It should be verified with a timed browser playthrough
+and no-scroll checks before being called submission ready.

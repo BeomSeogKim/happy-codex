@@ -768,6 +768,12 @@
         activeZone: 0,
         startedAt: Date.now(),
         final: false,
+        launchDeskCalm: false,
+        agentBoardCalm: false,
+        inboxWallCalm: false,
+        lightsOutUnlocked: false,
+        lightsOutEnabled: false,
+        progress: 0,
         statusMessage: "Launch Desk is active."
       };
 
@@ -784,6 +790,8 @@
         statusLine: document.getElementById("statusLine"),
         lightsButton: document.getElementById("lightsButton")
       };
+
+      window.noFiresState = state;
 
       function completedCount(zone) {
         return zone.tasks.filter((task) => task.done).length;
@@ -809,6 +817,37 @@
         return zones.length - progress();
       }
 
+      function visibleTaskState(zone, task, current) {
+        if (!task.done) {
+          return current ? "Now" : "Queued";
+        }
+
+        if (zone.id === "agents") {
+          return "Assigned";
+        }
+
+        if (zone.id === "inbox") {
+          if (task.correct === "archive") {
+            return "Archived";
+          }
+          if (task.correct === "schedule") {
+            return "Scheduled";
+          }
+          return "Cleared";
+        }
+
+        return task.correct === "block" ? "Blocked" : "Safe";
+      }
+
+      function syncStateModel() {
+        state.launchDeskCalm = isCalm(zones[0]);
+        state.agentBoardCalm = isCalm(zones[1]);
+        state.inboxWallCalm = isCalm(zones[2]);
+        state.progress = progress();
+        state.lightsOutUnlocked = state.progress === zones.length;
+        state.lightsOutEnabled = state.final;
+      }
+
       function renderZones() {
         refs.zones.innerHTML = zones
           .map((zone, zoneIndex) => {
@@ -817,7 +856,7 @@
             const rows = zone.tasks
               .map((task) => {
                 const current = !task.done && currentTask(zone) === task && active;
-                const stateText = task.done ? "Done" : current ? "Now" : "Queued";
+                const stateText = visibleTaskState(zone, task, current);
                 return `
                   <div class="queue-row ${task.done ? "is-done" : ""} ${current ? "is-current" : ""}">
                     <span class="dot" aria-hidden="true"></span>
@@ -858,11 +897,15 @@
           return;
         }
 
-        if (!task && lightsOutUnlocked()) {
-          refs.focusKicker.textContent = "Final switch";
-          refs.focusTitle.textContent = "Lights Out";
-          refs.cardLabel.textContent = "All zones calm";
-          refs.cardDetail.textContent = "The office is quiet. Turn off the final light.";
+        if (!task) {
+          const unlocked = lightsOutUnlocked();
+          refs.focusKicker.textContent = unlocked ? "Final switch" : "Zone calm";
+          refs.focusTitle.textContent = unlocked ? "Lights Out" : zone.label;
+          refs.cardLabel.textContent = unlocked ? "All zones calm" : zone.token;
+          refs.cardDetail.textContent = unlocked
+            ? "The office is quiet. Turn off the final light."
+            : "This zone is calm. The next zone is opening.";
+          refs.actionGrid.className = "action-grid";
           refs.actionGrid.innerHTML = "";
           return;
         }
@@ -904,6 +947,7 @@
       }
 
       function render() {
+        syncStateModel();
         document.body.classList.toggle("lights-out", state.final);
         renderZones();
         renderFocus();

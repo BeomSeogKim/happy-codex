@@ -32,13 +32,17 @@ jobs:
           test -f index.html
           test -f assets/styles.css
           test -f assets/app.js
-          ! grep -RInE 'https?://|AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9_-]{20,}|(api[_-]?key|password)[[:space:]]*[:=]' index.html assets
+          test -f projects/last-green-gate/index.html
+          test -f projects/last-green-gate/assets/styles.css
+          test -f projects/last-green-gate/assets/app.js
+          ! grep -RInE 'https?://|AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9_-]{20,}|(api[_-]?key|password)[[:space:]]*[:=]' index.html assets projects/last-green-gate
 
       - name: Prepare Pages artifact
         run: |
           mkdir -p _site
           cp index.html _site/index.html
           cp -R assets _site/assets
+          cp -R projects _site/projects
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

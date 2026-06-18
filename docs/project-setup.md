@@ -40,35 +40,24 @@ For exploration work, the top three candidate specs are:
 2. [No Fires Left](specs/no-fires-left.md)
 3. [Do Not Disturb Console](specs/do-not-disturb-console.md)
 
-## Suggested Repository Layout
+## Implementation Layout
 
-The repository is currently documentation-first. A future implementation can use
-one of these layouts.
-
-For a no-build static version:
+The current implementation uses the no-build static layout:
 
 ```text
 index.html
 assets/
-  images/
-  audio/
-docs/
-  specs/
-```
-
-For a minimal frontend build:
-
-```text
-src/
-  main.ts
+  app.js
   styles.css
-  game-state.ts
-public/
+projects/
+  last-green-gate/
 docs/
   specs/
 ```
 
-Start with the no-build version unless a build step clearly improves the result.
+Keep the no-build version unless a build step clearly improves interaction or
+rendering. `index.html` is the deployable entry point. `projects/last-green-gate/`
+is an isolated evaluation copy of the selected implementation.
 
 ## Core Roles
 

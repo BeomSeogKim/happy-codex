@@ -29,6 +29,8 @@ body {
 }
 
 body {
+  display: grid;
+  place-items: center;
   margin: 0;
   overflow: hidden;
   background:
@@ -52,7 +54,7 @@ button {
   gap: 12px;
   width: min(1180px, calc(100vw - 32px));
   height: min(700px, calc(100svh - 24px));
-  margin: 12px auto;
+  margin: 0 auto;
   padding: 16px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -242,14 +244,16 @@ h1 {
 
 .rows {
   display: grid;
-  grid-template-rows: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, auto);
+  align-content: start;
   gap: 8px;
   min-height: 0;
+  overflow: hidden;
 }
 
 .check-row {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
   gap: 8px;
   min-height: 0;
   padding: 10px;
@@ -260,6 +264,7 @@ h1 {
 }
 
 .check-row.is-active {
+  min-height: 180px;
   border-color: var(--line-strong);
   background: var(--panel);
 }
@@ -271,6 +276,11 @@ h1 {
 
 .check-row.is-waiting {
   background: #f4f5ef;
+}
+
+.check-row.is-complete .quiet-summary,
+.check-row.is-waiting .waiting-summary {
+  display: none;
 }
 
 .row-head {
@@ -593,7 +603,7 @@ h1 {
   .app-shell {
     width: min(100vw - 16px, 560px);
     height: calc(100svh - 16px);
-    margin: 8px auto;
+    margin: 0 auto;
     padding: 10px;
     gap: 8px;
   }
@@ -695,7 +705,7 @@ h1 {
   }
 
   .task-action {
-    min-height: 52px;
+    min-height: 64px;
     font-size: 0.78rem;
   }
 
@@ -774,7 +784,7 @@ h1 {
   .app-shell {
     width: calc(100vw - 10px);
     height: calc(100svh - 10px);
-    margin: 5px auto;
+    margin: 0 auto;
     padding: 8px;
   }
 
@@ -796,6 +806,33 @@ h1 {
 
   .workbench {
     grid-template-columns: minmax(0, 1fr) 106px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .task-card {
+    grid-template-columns: minmax(0, 1fr) 74px;
+    grid-template-rows: auto auto;
+    column-gap: 8px;
+    min-height: 72px;
+  }
+
+  .card-top {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .task-feedback {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .task-action {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    min-width: 74px;
   }
 }
 
