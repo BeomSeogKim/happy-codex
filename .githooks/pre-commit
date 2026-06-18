@@ -1,0 +1,52 @@
+#!/bin/sh
+set -eu
+
+SESSION_FILE=".codex/session/current"
+
+fail() {
+  printf '%s\n' "$@" >&2
+  exit 1
+}
+
+if [ ! -f "$SESSION_FILE" ]; then
+  fail \
+    "Session commit policy: no active session." \
+    "Run: scripts/start-session.sh [session-id]" \
+    "Then stage the full session with: git add -A"
+fi
+
+SESSION_ID=$(sed -n '1p' "$SESSION_FILE" | tr -d '[:space:]')
+
+case "$SESSION_ID" in
+  "")
+    fail "Session commit policy: .codex/session/current is empty."
+    ;;
+  *[!A-Za-z0-9._-]*)
+    fail "Session commit policy: session id may only use A-Z, a-z, 0-9, dot, underscore, and dash."
+    ;;
+esac
+
+UNSTAGED_FILES=$(git diff --name-only)
+UNTRACKED_FILES=$(git ls-files --others --exclude-standard)
+
+if [ -n "$UNSTAGED_FILES" ] || [ -n "$UNTRACKED_FILES" ]; then
+  printf '%s\n' "Session commit policy: commit the whole active session, not a partial snapshot." >&2
+  printf '%s\n' "Stage every changed file with: git add -A" >&2
+  printf '%s\n' "If a file is not part of the session, remove it, stash it, or add an intentional ignore rule." >&2
+
+  if [ -n "$UNSTAGED_FILES" ]; then
+    printf '\n%s\n' "Unstaged tracked files:" >&2
+    printf '%s\n' "$UNSTAGED_FILES" | sed 's/^/  - /' >&2
+  fi
+
+  if [ -n "$UNTRACKED_FILES" ]; then
+    printf '\n%s\n' "Untracked non-ignored files:" >&2
+    printf '%s\n' "$UNTRACKED_FILES" | sed 's/^/  - /' >&2
+  fi
+
+  exit 1
+fi
+
+if git diff --cached --quiet --exit-code; then
+  fail "Session commit policy: no staged changes found."
+fi

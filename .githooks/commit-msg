@@ -1,0 +1,41 @@
+#!/bin/sh
+set -eu
+
+MSG_FILE="$1"
+SESSION_FILE=".codex/session/current"
+
+fail() {
+  printf '%s\n' "$@" >&2
+  exit 1
+}
+
+if [ ! -f "$SESSION_FILE" ]; then
+  fail \
+    "Session commit policy: no active session." \
+    "Run: scripts/start-session.sh [session-id]"
+fi
+
+SESSION_ID=$(sed -n '1p' "$SESSION_FILE" | tr -d '[:space:]')
+
+case "$SESSION_ID" in
+  "")
+    fail "Session commit policy: .codex/session/current is empty."
+    ;;
+  *[!A-Za-z0-9._-]*)
+    fail "Session commit policy: session id may only use A-Z, a-z, 0-9, dot, underscore, and dash."
+    ;;
+esac
+
+SESSION_LINES=$(sed -n '/^[[:space:]]*#/d; s/^[[:space:]]*Session:[[:space:]]*//p' "$MSG_FILE")
+BAD_SESSION=$(printf '%s\n' "$SESSION_LINES" | awk -v expected="$SESSION_ID" 'NF && $0 != expected { print; exit }')
+
+if [ -n "$BAD_SESSION" ]; then
+  fail \
+    "Session commit policy: commit message has a different Session trailer." \
+    "Expected: Session: $SESSION_ID" \
+    "Found:    Session: $BAD_SESSION"
+fi
+
+if [ -z "$SESSION_LINES" ]; then
+  printf '\nSession: %s\n' "$SESSION_ID" >> "$MSG_FILE"
+fi
